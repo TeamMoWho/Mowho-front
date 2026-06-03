@@ -1,4 +1,5 @@
 import { Modak_400Regular } from "@expo-google-fonts/modak";
+import { Jua_400Regular } from "@expo-google-fonts/jua";
 import { useFonts } from "expo-font";
 import { DarkTheme, DefaultTheme, ThemeProvider } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -20,6 +21,7 @@ export default function TabLayout() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [fontsLoaded] = useFonts({
     Modak: Modak_400Regular,
+    Jua: Jua_400Regular,
   });
 
   useEffect(() => {

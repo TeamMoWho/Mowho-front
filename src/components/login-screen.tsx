@@ -5,11 +5,9 @@ import {
   TextInput,
   TouchableOpacity,
   Text,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
   Dimensions,
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Image } from 'expo-image';
 import { Colors } from '@/constants/theme';
 
@@ -49,11 +47,12 @@ export default function LoginScreen({ onLoginSuccess }: LoginProps) {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    <KeyboardAwareScrollView
       style={styles.container}
+      contentContainerStyle={styles.scrollContent}
+      enableOnAndroid
+      keyboardShouldPersistTaps="handled"
     >
-      <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.topSection}>
           {/* 로고 */}
           <View style={styles.logoContainer}>
@@ -67,11 +66,29 @@ export default function LoginScreen({ onLoginSuccess }: LoginProps) {
           </View>
 
           {/* 설명 텍스트 */}
-          <View style={styles.descriptionContainer}>
-            <Text style={styles.description}>
-              당신이 찾던 바로 그 후기,{'\n'}
-              쉬향, 저것 리뷰, 여기서 확인하세요
-            </Text>
+          <View style={[styles.descriptionContainer, { opacity: 0 }]}>
+            <View style={styles.descriptionWrapper}>
+              <Text style={[styles.description, styles.descriptionOutline, { top: -0.8 }]}>
+                당신이 찾던 바로 그 후기,{'\n'}
+                취향 저격 리뷰, 여기서 확인하세요
+              </Text>
+              <Text style={[styles.description, styles.descriptionOutline, { top: 0.8 }]}>
+                당신이 찾던 바로 그 후기,{'\n'}
+                취향 저격 리뷰, 여기서 확인하세요
+              </Text>
+              <Text style={[styles.description, styles.descriptionOutline, { left: -0.8 }]}>
+                당신이 찾던 바로 그 후기,{'\n'}
+                취향 저격 리뷰, 여기서 확인하세요
+              </Text>
+              <Text style={[styles.description, styles.descriptionOutline, { left: 0.8 }]}>
+                당신이 찾던 바로 그 후기,{'\n'}
+                취향 저격 리뷰, 여기서 확인하세요
+              </Text>
+              <Text style={styles.description}>
+                당신이 찾던 바로 그 후기,{'\n'}
+                취향 저격 리뷰, 여기서 확인하세요
+              </Text>
+            </View>
           </View>
         </View>
 
@@ -116,8 +133,7 @@ export default function LoginScreen({ onLoginSuccess }: LoginProps) {
             <Text style={styles.signUpButtonText}>회원가입</Text>
           </TouchableOpacity>
         </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+    </KeyboardAwareScrollView>
   );
 }
 
@@ -128,12 +144,13 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 40,
   },
   topSection: {
-    marginBottom: height * 0.1,
+    height: height * 0.55,
+    justifyContent: 'center',
     alignItems: 'center',
   },
   logoContainer: {
@@ -161,25 +178,32 @@ const styles = StyleSheet.create({
   descriptionContainer: {
     alignItems: 'center',
   },
+  descriptionWrapper: {
+    position: 'relative',
+  },
+  descriptionOutline: {
+    position: 'absolute',
+    color: 'rgba(0, 0, 0, 0.8)',
+    textShadowColor: 'transparent',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 0,
+  },
   description: {
-    fontSize: 22,
+    fontSize: 26,
     color: 'white',
     textAlign: 'center',
     lineHeight: 28,
-    fontWeight: '800',
-    fontFamily: 'Inter',
-    textShadowColor: 'rgba(56, 71, 43, 0.25)',
-    textShadowOffset: { width: 0, height: 4 },
-    textShadowRadius: 2,
+    fontWeight: '900',
+    fontFamily: 'Jua',
   },
   formContainer: {
-    gap: 12,
+    gap: 20,
   },
   input: {
     backgroundColor: 'white',
     borderRadius: 12,
     paddingHorizontal: 16,
-    paddingVertical: 14,
+    height: 53,
     fontSize: 16,
     color: Colors.light.text,
   },
@@ -188,7 +212,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: 20,
   },
   loginButtonDisabled: {
     opacity: 0.6,
@@ -199,9 +223,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   signUpButton: {
-    backgroundColor: Colors.light.primary,
-    borderWidth: 2,
-    borderColor: 'white',
+    backgroundColor: '#2BB509',
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: 'center',
