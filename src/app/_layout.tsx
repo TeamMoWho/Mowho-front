@@ -1,5 +1,6 @@
 import { Modak_400Regular } from "@expo-google-fonts/modak";
 import { Jua_400Regular } from "@expo-google-fonts/jua";
+import { Inter_400Regular, Inter_600SemiBold, Inter_700Bold } from "@expo-google-fonts/inter";
 import { useFonts } from "expo-font";
 import { DarkTheme, DefaultTheme, ThemeProvider } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -8,10 +9,12 @@ import { useColorScheme } from "react-native";
 
 import { AnimatedSplashOverlay } from "@/components/animated-icon";
 import AppTabs from "@/components/app-tabs";
+import CategoryScreen from "@/components/category-screen";
 import LoginScreen from "@/components/login-screen";
+import SignUpScreen from "@/components/signup-screen";
 import { SplashScreen as SplashScreenComponent } from "@/components/splash-screen";
 
-type AppState = "splash" | "login" | "app";
+type AppState = "splash" | "login" | "signup" | "category" | "app";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -22,6 +25,9 @@ export default function TabLayout() {
   const [fontsLoaded] = useFonts({
     Modak: Modak_400Regular,
     Jua: Jua_400Regular,
+    Inter: Inter_400Regular,
+    'Inter-SemiBold': Inter_600SemiBold,
+    'Inter-Bold': Inter_700Bold,
   });
 
   useEffect(() => {
@@ -45,8 +51,11 @@ export default function TabLayout() {
   }, []);
 
   const handleLoginSuccess = () => {
-    setIsLoggedIn(true);
-    setAppState("app");
+    setAppState("category");
+  };
+
+  const handleSignUpSuccess = () => {
+    setAppState("login");
   };
 
   if (!fontsLoaded) {
@@ -57,7 +66,13 @@ export default function TabLayout() {
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       {appState === "splash" && <SplashScreenComponent />}
       {appState === "login" && (
-        <LoginScreen onLoginSuccess={handleLoginSuccess} />
+        <LoginScreen onLoginSuccess={handleLoginSuccess} onSignUp={() => setAppState("signup")} />
+      )}
+      {appState === "signup" && (
+        <SignUpScreen onSignUpSuccess={handleSignUpSuccess} onBack={() => setAppState("login")} />
+      )}
+      {appState === "category" && (
+        <CategoryScreen onConfirm={() => { setIsLoggedIn(true); setAppState("app"); }} />
       )}
       {appState === "app" && (
         <>

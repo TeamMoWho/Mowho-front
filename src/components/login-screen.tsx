@@ -15,9 +15,13 @@ const { height } = Dimensions.get('window');
 
 interface LoginProps {
   onLoginSuccess?: () => void;
+  onSignUp?: () => void;
 }
 
-export default function LoginScreen({ onLoginSuccess }: LoginProps) {
+const VALID_USERNAME = 'mowho123';
+const VALID_PASSWORD = 'mowho12345';
+
+export default function LoginScreen({ onLoginSuccess, onSignUp }: LoginProps) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -29,21 +33,18 @@ export default function LoginScreen({ onLoginSuccess }: LoginProps) {
     }
 
     setLoading(true);
-    try {
-      // TODO: 실제 API 호출
-      setTimeout(() => {
-        setLoading(false);
-        onLoginSuccess?.();
-      }, 1000);
-    } catch (error) {
+    setTimeout(() => {
       setLoading(false);
-      alert('로그인 실패');
-    }
+      if (username === VALID_USERNAME && password === VALID_PASSWORD) {
+        onLoginSuccess?.();
+      } else {
+        alert('아이디 또는 비밀번호가 올바르지 않습니다');
+      }
+    }, 500);
   };
 
   const handleSignUp = () => {
-    // TODO: 회원가입 화면으로 이동
-    alert('회원가입 페이지로 이동합니다');
+    onSignUp?.();
   };
 
   return (
@@ -197,7 +198,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Jua',
   },
   formContainer: {
-    gap: 20,
+    gap: 10,
   },
   input: {
     backgroundColor: 'white',
@@ -212,15 +213,16 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 10,
   },
   loginButtonDisabled: {
     opacity: 0.6,
   },
   loginButtonText: {
     color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 18,
+    fontWeight: '700',
+    fontFamily: 'Inter-SemiBold',
   },
   signUpButton: {
     backgroundColor: '#2BB509',
@@ -230,7 +232,8 @@ const styles = StyleSheet.create({
   },
   signUpButtonText: {
     color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 18,
+    fontWeight: '700',
+    fontFamily: 'Inter-SemiBold',
   },
 });
