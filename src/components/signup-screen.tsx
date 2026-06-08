@@ -12,6 +12,7 @@ import {
   Platform,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '@/constants/theme';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -36,6 +37,7 @@ interface SignUpProps {
 }
 
 export default function SignUpScreen({ onSignUpSuccess, onBack }: SignUpProps) {
+  const insets = useSafeAreaInsets();
   const [step, setStep] = useState(0);
   const [nickname, setNickname] = useState('');
   const [username, setUsername] = useState('');
@@ -146,10 +148,12 @@ export default function SignUpScreen({ onSignUpSuccess, onBack }: SignUpProps) {
     }
   };
 
+  const EXISTING_USERNAMES = ['mowho123'];
+
   const checkDuplicate = async () => {
     if (!username.trim()) return;
     // TODO: 실제 API 호출
-    const isDuplicate = false;
+    const isDuplicate = EXISTING_USERNAMES.includes(username.trim());
     if (isDuplicate) {
       setUsernameStatus('duplicate');
     } else {
@@ -294,8 +298,8 @@ export default function SignUpScreen({ onSignUpSuccess, onBack }: SignUpProps) {
                       onChangeText={handleUsernameChange}
                       autoCapitalize="none"
                       keyboardType="ascii-capable"
-                      returnKeyType="next"
-                      onSubmitEditing={() => handleFieldSubmit(1)}
+                      returnKeyType="done"
+                      onSubmitEditing={() => usernameRef.current?.blur()}
                     />
                     {usernameStatus === 'available' && (
                       <Text style={styles.validText}>사용 가능한 아이디입니다</Text>
@@ -376,7 +380,7 @@ export default function SignUpScreen({ onSignUpSuccess, onBack }: SignUpProps) {
         </View>
       </KeyboardAwareScrollView>
 
-      <View style={styles.bottomContainer}>
+      <View style={[styles.bottomContainer, { paddingBottom: Math.max(insets.bottom, 16) }]}>
         <Text style={styles.disclaimer}>
           가입 버튼을 누르시면 위치기반 서비스에 동의한걸로 처리됩니다
         </Text>
@@ -404,13 +408,14 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingTop: 50,
     paddingBottom: 20,
   },
   backButton: {
-    paddingTop: 40,
-    paddingHorizontal: 4,
-    alignSelf: 'flex-start',
+    position: 'absolute',
+    top: 41,
+    left: 24,
+    zIndex: 10,
   },
   backButtonText: {
     fontSize: 22,
@@ -420,9 +425,9 @@ const styles = StyleSheet.create({
   },
   topSection: {
     alignItems: 'center',
-    paddingTop: 10,
-    marginBottom: 30,
-    height: SCREEN_HEIGHT * 0.28,
+    paddingTop: 48,
+    marginBottom: 44,
+    height: SCREEN_HEIGHT * 0.22,
     justifyContent: 'center',
   },
   titleWrapper: {

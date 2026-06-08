@@ -8,8 +8,8 @@ import { useEffect, useState } from "react";
 import { useColorScheme } from "react-native";
 
 import { AnimatedSplashOverlay } from "@/components/animated-icon";
-import AppTabs from "@/components/app-tabs";
 import CategoryScreen from "@/components/category-screen";
+import MainScreen from "@/components/main-screen";
 import LoginScreen from "@/components/login-screen";
 import SignUpScreen from "@/components/signup-screen";
 import { SplashScreen as SplashScreenComponent } from "@/components/splash-screen";
@@ -20,7 +20,7 @@ SplashScreen.preventAutoHideAsync();
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  const [appState, setAppState] = useState<AppState>("splash");
+  const [appState, setAppState] = useState<AppState>("app");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [fontsLoaded] = useFonts({
     Modak: Modak_400Regular,
@@ -43,19 +43,20 @@ export default function TabLayout() {
   //   return () => clearTimeout(splashTimer);
   // }, []);
 
-  useEffect(() => {
-    const splashTimer = setTimeout(() => {
-      setAppState('login');
-    }, 2000);
-    return () => clearTimeout(splashTimer);
-  }, []);
+  // useEffect(() => {
+  //   const splashTimer = setTimeout(() => {
+  //     setAppState('login');
+  //   }, 2000);
+  //   return () => clearTimeout(splashTimer);
+  // }, []);
 
   const handleLoginSuccess = () => {
-    setAppState("category");
+    setIsLoggedIn(true);
+    setAppState("app");
   };
 
   const handleSignUpSuccess = () => {
-    setAppState("login");
+    setAppState("category");
   };
 
   if (!fontsLoaded) {
@@ -75,10 +76,7 @@ export default function TabLayout() {
         <CategoryScreen onConfirm={() => { setIsLoggedIn(true); setAppState("app"); }} />
       )}
       {appState === "app" && (
-        <>
-          <AnimatedSplashOverlay />
-          <AppTabs />
-        </>
+        <MainScreen />
       )}
     </ThemeProvider>
   );
