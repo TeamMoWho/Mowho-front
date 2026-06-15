@@ -13,8 +13,10 @@ import MainScreen from "@/components/main-screen";
 import LoginScreen from "@/components/login-screen";
 import SignUpScreen from "@/components/signup-screen";
 import { SplashScreen as SplashScreenComponent } from "@/components/splash-screen";
+import RestaurantScreen from "@/components/restaurant-screen";
+import LookScreen from "@/components/look-screen";
 
-type AppState = "splash" | "login" | "signup" | "category" | "app";
+type AppState = "splash" | "login" | "signup" | "category" | "app" | "restaurant" | "look";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -76,7 +78,16 @@ export default function TabLayout() {
         <CategoryScreen onConfirm={() => { setIsLoggedIn(true); setAppState("app"); }} />
       )}
       {appState === "app" && (
-        <MainScreen />
+        <MainScreen
+          onCategoryPress={(id) => { if (id === 'restaurant') setAppState('restaurant'); }}
+          onLookPress={() => setAppState('look')}
+        />
+      )}
+      {appState === "restaurant" && (
+        <RestaurantScreen onBack={() => setAppState("app")} />
+      )}
+      {appState === "look" && (
+        <LookScreen onBack={() => setAppState("app")} />
       )}
     </ThemeProvider>
   );

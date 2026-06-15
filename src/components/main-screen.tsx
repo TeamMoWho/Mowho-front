@@ -72,9 +72,11 @@ const NAV_MARGIN_BOTTOM = -8;
 
 interface MainScreenProps {
   onLogout?: () => void;
+  onCategoryPress?: (categoryId: string) => void;
+  onLookPress?: () => void;
 }
 
-export default function MainScreen({ onLogout }: MainScreenProps) {
+export default function MainScreen({ onLogout, onCategoryPress, onLookPress }: MainScreenProps) {
   const [activeTab, setActiveTab] = useState('home');
   const [searchText, setSearchText] = useState('');
   const [bannerIndex, setBannerIndex] = useState(0);
@@ -187,7 +189,7 @@ export default function MainScreen({ onLogout }: MainScreenProps) {
         <View style={styles.categorySection}>
           <View style={styles.categoryRow}>
             {CATEGORIES_ROW1.map(cat => (
-              <TouchableOpacity key={cat.id} style={styles.categoryItem} activeOpacity={0.7}>
+              <TouchableOpacity key={cat.id} style={styles.categoryItem} activeOpacity={0.7} onPress={() => onCategoryPress?.(cat.id)}>
                 <Image source={cat.image} style={styles.categoryIcon} resizeMode="contain" />
                 <Text style={styles.categoryLabel}>{cat.label}</Text>
               </TouchableOpacity>
@@ -195,7 +197,7 @@ export default function MainScreen({ onLogout }: MainScreenProps) {
           </View>
           <View style={styles.categoryRow}>
             {CATEGORIES_ROW2.map(cat => (
-              <TouchableOpacity key={cat.id} style={styles.categoryItem} activeOpacity={0.7}>
+              <TouchableOpacity key={cat.id} style={styles.categoryItem} activeOpacity={0.7} onPress={() => onCategoryPress?.(cat.id)}>
                 {(cat as any).image
                   ? <Image source={(cat as any).image} style={styles.categoryIcon} resizeMode="contain" />
                   : <Text style={styles.categoryEmoji}>{(cat as any).emoji}</Text>
@@ -237,7 +239,10 @@ export default function MainScreen({ onLogout }: MainScreenProps) {
             <TouchableOpacity
               key={tab.id}
               style={styles.navItem}
-              onPress={() => setActiveTab(tab.id)}
+              onPress={() => {
+                setActiveTab(tab.id);
+                if (tab.id === 'look') onLookPress?.();
+              }}
               activeOpacity={0.7}
             >
               <View style={[styles.navTabInner, activeTab === tab.id && styles.navTabInnerActive, (tab as any).pb && { paddingBottom: (tab as any).pb }]}>
