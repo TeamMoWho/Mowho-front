@@ -15,8 +15,35 @@ import SignUpScreen from "@/components/signup-screen";
 import { SplashScreen as SplashScreenComponent } from "@/components/splash-screen";
 import RestaurantScreen from "@/components/restaurant-screen";
 import LookScreen from "@/components/look-screen";
+import MyPageScreen from "@/components/my-page-screen";
+import MyInfoScreen from "@/components/my-info-screen";
+import PasswordChangeScreen from "@/components/password-change-screen";
+import CustomerCenterScreen from "@/components/customer-center-screen";
+import NotificationScreen from "@/components/notification-screen";
+import FollowScreen from "@/components/follow-screen";
+import NotificationBellScreen from "@/components/notification-bell-screen";
+import SettingsScreen from "@/components/settings-screen";
+import TermsPolicyScreen from "@/components/terms-policy-screen";
+import WithdrawalScreen from "@/components/withdrawal-screen";
 
-type AppState = "splash" | "login" | "signup" | "category" | "app" | "restaurant" | "look";
+type AppState =
+  | "splash"
+  | "login"
+  | "signup"
+  | "category"
+  | "app"
+  | "restaurant"
+  | "look"
+  | "mypage"
+  | "customer"
+  | "myinfo"
+  | "password-change"
+  | "notification"
+  | "follow"
+  | "bell-notification"
+  | "settings"
+  | "terms"
+  | "withdrawal";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -81,13 +108,128 @@ export default function TabLayout() {
         <MainScreen
           onCategoryPress={(id) => { if (id === 'restaurant') setAppState('restaurant'); }}
           onLookPress={() => setAppState('look')}
+          onMyPress={() => setAppState('mypage')}
         />
       )}
       {appState === "restaurant" && (
-        <RestaurantScreen onBack={() => setAppState("app")} />
+        <RestaurantScreen
+          onBack={() => setAppState("app")}
+          onHomePress={() => setAppState("app")}
+          onLookPress={() => setAppState("look")}
+          onMyPress={() => setAppState("mypage")}
+        />
       )}
       {appState === "look" && (
-        <LookScreen onBack={() => setAppState("app")} />
+        <LookScreen
+          onBack={() => setAppState("app")}
+          onHomePress={() => setAppState("app")}
+          onMyPress={() => setAppState("mypage")}
+        />
+      )}
+      {appState === "mypage" && (
+        <MyPageScreen
+          onHomePress={() => setAppState("app")}
+          onLookPress={() => setAppState("look")}
+          onBellPress={() => setAppState("bell-notification")}
+          onSettingsPress={() => setAppState("settings")}
+          onMenuPress={(menuId) => {
+            if (menuId === 'my-info') setAppState('myinfo');
+            if (menuId === 'follow') setAppState('follow');
+            if (menuId === 'notification') setAppState('notification');
+            if (menuId === 'support') setAppState('customer');
+          }}
+        />
+      )}
+      {appState === "settings" && (
+        <SettingsScreen
+          onBack={() => setAppState("mypage")}
+          onHomePress={() => setAppState("app")}
+          onLookPress={() => setAppState("look")}
+          onWritePress={() => setAppState("app")}
+          onLikePress={() => setAppState("app")}
+          onMyPress={() => setAppState("mypage")}
+          onTermsPress={() => setAppState("terms")}
+          onLogoutConfirm={() => { setIsLoggedIn(false); setAppState("login"); }}
+          onWithdrawalPress={() => setAppState("withdrawal")}
+        />
+      )}
+      {appState === "terms" && (
+        <TermsPolicyScreen
+          onBack={() => setAppState("settings")}
+          onHomePress={() => setAppState("app")}
+          onLookPress={() => setAppState("look")}
+          onWritePress={() => setAppState("app")}
+          onLikePress={() => setAppState("app")}
+          onMyPress={() => setAppState("mypage")}
+        />
+      )}
+      {appState === "withdrawal" && (
+        <WithdrawalScreen
+          onBack={() => setAppState("settings")}
+          onHomePress={() => setAppState("app")}
+          onLookPress={() => setAppState("look")}
+          onWritePress={() => setAppState("app")}
+          onLikePress={() => setAppState("app")}
+          onMyPress={() => setAppState("mypage")}
+          onConfirmWithdrawal={() => { setIsLoggedIn(false); setAppState("login"); }}
+        />
+      )}
+      {appState === "follow" && (
+        <FollowScreen
+          onBack={() => setAppState("mypage")}
+          onHomePress={() => setAppState("app")}
+          onLookPress={() => setAppState("look")}
+          onWritePress={() => setAppState("app")}
+          onLikePress={() => setAppState("app")}
+          onMyPress={() => setAppState("mypage")}
+        />
+      )}
+      {appState === "notification" && (
+        <NotificationScreen
+          onBack={() => setAppState("mypage")}
+          onHomePress={() => setAppState("app")}
+          onLookPress={() => setAppState("look")}
+          onWritePress={() => setAppState("app")}
+          onLikePress={() => setAppState("app")}
+          onMyPress={() => setAppState("mypage")}
+        />
+      )}
+      {appState === "bell-notification" && (
+        <NotificationBellScreen
+          onBack={() => setAppState("mypage")}
+          onHomePress={() => setAppState("app")}
+          onLookPress={() => setAppState("look")}
+          onWritePress={() => setAppState("app")}
+          onLikePress={() => setAppState("app")}
+          onMyPress={() => setAppState("mypage")}
+        />
+      )}
+      {appState === "customer" && (
+        <CustomerCenterScreen
+          onHomePress={() => setAppState("app")}
+          onLookPress={() => setAppState("look")}
+          onWritePress={() => setAppState("app")}
+          onLikePress={() => setAppState("app")}
+          onMyPress={() => setAppState("mypage")}
+          onBack={() => setAppState("mypage")}
+        />
+      )}
+      {appState === "myinfo" && (
+        <MyInfoScreen
+          onHomePress={() => setAppState("app")}
+          onLookPress={() => setAppState("look")}
+          onMyPress={() => setAppState("mypage")}
+          onPasswordPress={() => setAppState("password-change")}
+          onBack={() => setAppState("mypage")}
+        />
+      )}
+      {appState === "password-change" && (
+        <PasswordChangeScreen
+          onBack={() => setAppState("myinfo")}
+          onHomePress={() => setAppState("app")}
+          onLookPress={() => setAppState("look")}
+          onMyPress={() => setAppState("mypage")}
+        />
       )}
     </ThemeProvider>
   );

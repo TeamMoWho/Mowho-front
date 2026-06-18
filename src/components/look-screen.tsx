@@ -91,9 +91,11 @@ const NAV_MARGIN_BOTTOM = -8;
 
 interface LookScreenProps {
   onBack?: () => void;
+  onHomePress?: () => void;
+  onMyPress?: () => void;
 }
 
-export default function LookScreen({ onBack }: LookScreenProps) {
+export default function LookScreen({ onBack, onHomePress, onMyPress }: LookScreenProps) {
   const insets = useSafeAreaInsets();
   const navBottom = insets.bottom + NAV_MARGIN_BOTTOM;
   const scrollPaddingBottom = NAV_HEIGHT + navBottom + 20;
@@ -573,7 +575,13 @@ export default function LookScreen({ onBack }: LookScreenProps) {
               key={tab.id}
               style={styles.navItem}
               activeOpacity={0.7}
-              onPress={() => tab.id === 'home' && onBack?.()}
+              onPress={() => {
+                if (tab.id === 'home') {
+                  if (onHomePress) onHomePress();
+                  else onBack?.();
+                }
+                if (tab.id === 'my') onMyPress?.();
+              }}
             >
               <View style={[
                 styles.navTabInner,

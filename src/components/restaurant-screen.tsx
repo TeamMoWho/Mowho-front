@@ -43,9 +43,12 @@ const REVIEWS = [
 
 interface RestaurantScreenProps {
   onBack?: () => void;
+  onHomePress?: () => void;
+  onLookPress?: () => void;
+  onMyPress?: () => void;
 }
 
-export default function RestaurantScreen({ onBack }: RestaurantScreenProps) {
+export default function RestaurantScreen({ onBack, onHomePress, onLookPress, onMyPress }: RestaurantScreenProps) {
   const insets = useSafeAreaInsets();
   const navBottom = insets.bottom + NAV_MARGIN_BOTTOM;
   const scrollPaddingBottom = NAV_HEIGHT + navBottom + 20;
@@ -159,7 +162,19 @@ export default function RestaurantScreen({ onBack }: RestaurantScreenProps) {
       <View style={[styles.navWrapper, { bottom: navBottom }]} pointerEvents="box-none">
         <View style={styles.navBar}>
           {NAV_TABS.map((tab) => (
-            <TouchableOpacity key={tab.id} style={styles.navItem} activeOpacity={0.7}>
+            <TouchableOpacity
+              key={tab.id}
+              style={styles.navItem}
+              activeOpacity={0.7}
+              onPress={() => {
+                if (tab.id === 'home') {
+                  if (onHomePress) onHomePress();
+                  else onBack?.();
+                }
+                if (tab.id === 'look') onLookPress?.();
+                if (tab.id === 'my') onMyPress?.();
+              }}
+            >
               <View style={[
                 styles.navTabInner,
                 tab.id === 'home' && styles.navTabInnerActive,
