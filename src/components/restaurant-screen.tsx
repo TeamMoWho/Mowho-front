@@ -45,10 +45,11 @@ interface RestaurantScreenProps {
   onBack?: () => void;
   onHomePress?: () => void;
   onLookPress?: () => void;
+  onLikePress?: () => void;
   onMyPress?: () => void;
 }
 
-export default function RestaurantScreen({ onBack, onHomePress, onLookPress, onMyPress }: RestaurantScreenProps) {
+export default function RestaurantScreen({ onBack, onHomePress, onLookPress, onLikePress, onMyPress }: RestaurantScreenProps) {
   const insets = useSafeAreaInsets();
   const navBottom = insets.bottom + NAV_MARGIN_BOTTOM;
   const scrollPaddingBottom = NAV_HEIGHT + navBottom + 20;
@@ -172,6 +173,7 @@ export default function RestaurantScreen({ onBack, onHomePress, onLookPress, onM
                   else onBack?.();
                 }
                 if (tab.id === 'look') onLookPress?.();
+                if (tab.id === 'like') onLikePress?.();
                 if (tab.id === 'my') onMyPress?.();
               }}
             >

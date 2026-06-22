@@ -74,10 +74,11 @@ interface MainScreenProps {
   onLogout?: () => void;
   onCategoryPress?: (categoryId: string) => void;
   onLookPress?: () => void;
+  onLikePress?: () => void;
   onMyPress?: () => void;
 }
 
-export default function MainScreen({ onLogout, onCategoryPress, onLookPress, onMyPress }: MainScreenProps) {
+export default function MainScreen({ onLogout, onCategoryPress, onLookPress, onLikePress, onMyPress }: MainScreenProps) {
   const [activeTab, setActiveTab] = useState('home');
   const [searchText, setSearchText] = useState('');
   const [bannerIndex, setBannerIndex] = useState(0);
@@ -243,6 +244,7 @@ export default function MainScreen({ onLogout, onCategoryPress, onLookPress, onM
               onPress={() => {
                 setActiveTab(tab.id);
                 if (tab.id === 'look') onLookPress?.();
+                if (tab.id === 'like') onLikePress?.();
                 if (tab.id === 'my') onMyPress?.();
               }}
               activeOpacity={0.7}

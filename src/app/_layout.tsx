@@ -10,6 +10,7 @@ import { useColorScheme } from "react-native";
 import { AnimatedSplashOverlay } from "@/components/animated-icon";
 import CategoryScreen from "@/components/category-screen";
 import MainScreen from "@/components/main-screen";
+import LikeScreen from "@/components/like-screen";
 import LoginScreen from "@/components/login-screen";
 import SignUpScreen from "@/components/signup-screen";
 import { SplashScreen as SplashScreenComponent } from "@/components/splash-screen";
@@ -32,6 +33,7 @@ type AppState =
   | "signup"
   | "category"
   | "app"
+  | "like"
   | "restaurant"
   | "look"
   | "mypage"
@@ -108,7 +110,16 @@ export default function TabLayout() {
         <MainScreen
           onCategoryPress={(id) => { if (id === 'restaurant') setAppState('restaurant'); }}
           onLookPress={() => setAppState('look')}
+          onLikePress={() => setAppState('like')}
           onMyPress={() => setAppState('mypage')}
+        />
+      )}
+      {appState === "like" && (
+        <LikeScreen
+          onHomePress={() => setAppState("app")}
+          onLookPress={() => setAppState("look")}
+          onLikePress={() => setAppState("like")}
+          onMyPress={() => setAppState("mypage")}
         />
       )}
       {appState === "restaurant" && (
@@ -116,6 +127,7 @@ export default function TabLayout() {
           onBack={() => setAppState("app")}
           onHomePress={() => setAppState("app")}
           onLookPress={() => setAppState("look")}
+          onLikePress={() => setAppState("like")}
           onMyPress={() => setAppState("mypage")}
         />
       )}
@@ -123,6 +135,7 @@ export default function TabLayout() {
         <LookScreen
           onBack={() => setAppState("app")}
           onHomePress={() => setAppState("app")}
+          onLikePress={() => setAppState("like")}
           onMyPress={() => setAppState("mypage")}
         />
       )}
@@ -130,6 +143,7 @@ export default function TabLayout() {
         <MyPageScreen
           onHomePress={() => setAppState("app")}
           onLookPress={() => setAppState("look")}
+          onLikePress={() => setAppState("like")}
           onBellPress={() => setAppState("bell-notification")}
           onSettingsPress={() => setAppState("settings")}
           onMenuPress={(menuId) => {
@@ -146,7 +160,7 @@ export default function TabLayout() {
           onHomePress={() => setAppState("app")}
           onLookPress={() => setAppState("look")}
           onWritePress={() => setAppState("app")}
-          onLikePress={() => setAppState("app")}
+          onLikePress={() => setAppState("like")}
           onMyPress={() => setAppState("mypage")}
           onTermsPress={() => setAppState("terms")}
           onLogoutConfirm={() => { setIsLoggedIn(false); setAppState("login"); }}
@@ -159,7 +173,7 @@ export default function TabLayout() {
           onHomePress={() => setAppState("app")}
           onLookPress={() => setAppState("look")}
           onWritePress={() => setAppState("app")}
-          onLikePress={() => setAppState("app")}
+          onLikePress={() => setAppState("like")}
           onMyPress={() => setAppState("mypage")}
         />
       )}
@@ -169,7 +183,7 @@ export default function TabLayout() {
           onHomePress={() => setAppState("app")}
           onLookPress={() => setAppState("look")}
           onWritePress={() => setAppState("app")}
-          onLikePress={() => setAppState("app")}
+          onLikePress={() => setAppState("like")}
           onMyPress={() => setAppState("mypage")}
           onConfirmWithdrawal={() => { setIsLoggedIn(false); setAppState("login"); }}
         />
@@ -180,7 +194,7 @@ export default function TabLayout() {
           onHomePress={() => setAppState("app")}
           onLookPress={() => setAppState("look")}
           onWritePress={() => setAppState("app")}
-          onLikePress={() => setAppState("app")}
+          onLikePress={() => setAppState("like")}
           onMyPress={() => setAppState("mypage")}
         />
       )}
@@ -190,7 +204,7 @@ export default function TabLayout() {
           onHomePress={() => setAppState("app")}
           onLookPress={() => setAppState("look")}
           onWritePress={() => setAppState("app")}
-          onLikePress={() => setAppState("app")}
+          onLikePress={() => setAppState("like")}
           onMyPress={() => setAppState("mypage")}
         />
       )}
@@ -200,7 +214,7 @@ export default function TabLayout() {
           onHomePress={() => setAppState("app")}
           onLookPress={() => setAppState("look")}
           onWritePress={() => setAppState("app")}
-          onLikePress={() => setAppState("app")}
+          onLikePress={() => setAppState("like")}
           onMyPress={() => setAppState("mypage")}
         />
       )}
@@ -209,7 +223,7 @@ export default function TabLayout() {
           onHomePress={() => setAppState("app")}
           onLookPress={() => setAppState("look")}
           onWritePress={() => setAppState("app")}
-          onLikePress={() => setAppState("app")}
+          onLikePress={() => setAppState("like")}
           onMyPress={() => setAppState("mypage")}
           onBack={() => setAppState("mypage")}
         />
@@ -218,6 +232,7 @@ export default function TabLayout() {
         <MyInfoScreen
           onHomePress={() => setAppState("app")}
           onLookPress={() => setAppState("look")}
+          onLikePress={() => setAppState("like")}
           onMyPress={() => setAppState("mypage")}
           onPasswordPress={() => setAppState("password-change")}
           onBack={() => setAppState("mypage")}
@@ -228,6 +243,7 @@ export default function TabLayout() {
           onBack={() => setAppState("myinfo")}
           onHomePress={() => setAppState("app")}
           onLookPress={() => setAppState("look")}
+          onLikePress={() => setAppState("like")}
           onMyPress={() => setAppState("mypage")}
         />
       )}
