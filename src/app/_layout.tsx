@@ -9,14 +9,36 @@ import { useColorScheme } from "react-native";
 
 import { AnimatedSplashOverlay } from "@/components/animated-icon";
 import CategoryScreen from "@/components/category-screen";
-import MainScreen from "@/components/main-screen";
+import HomeScreen from "@/components/home-screen";
 import LoginScreen from "@/components/login-screen";
 import SignUpScreen from "@/components/signup-screen";
 import { SplashScreen as SplashScreenComponent } from "@/components/splash-screen";
 import RestaurantScreen from "@/components/restaurant-screen";
+import CafeScreen from "@/components/cafe-screen";
+import MovieScreen from "@/components/movie-screen";
+import StayScreen from "@/components/stay-screen";
+import CosmeticScreen from "@/components/cosmetic-screen";
+import TravelScreen from "@/components/travel-screen";
+import BookScreen from "@/components/book-screen";
+import ClothesScreen from "@/components/clothes-screen";
+import ElectronicsScreen from "@/components/electronics-screen";
+import EtcScreen from "@/components/etc-screen";
 import LookScreen from "@/components/look-screen";
+import BannerDetailScreen from "@/components/banner-detail-screen";
+import WriteScreen from "@/components/write-screen";
+import WriteReviewScreen from "@/components/write-review-screen";
 
-type AppState = "splash" | "login" | "signup" | "category" | "app" | "restaurant" | "look";
+type AppState =
+  | "splash" | "login" | "signup" | "category" | "app" | "look" | "write" | "writeReview"
+  | "restaurant" | "cafe" | "movie" | "stay" | "cosmetic"
+  | "travel" | "book" | "clothes" | "electronics" | "etc"
+  | "bannerDetail";
+
+const APP_STATE_BY_TAB: Partial<Record<string, AppState>> = {
+  home: 'app',
+  look: 'look',
+  write: 'write',
+};
 
 SplashScreen.preventAutoHideAsync();
 
@@ -24,6 +46,7 @@ export default function TabLayout() {
   const colorScheme = useColorScheme();
   const [appState, setAppState] = useState<AppState>("app");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [selectedBanner, setSelectedBanner] = useState(0);
   const [fontsLoaded] = useFonts({
     Modak: Modak_400Regular,
     Jua: Jua_400Regular,
@@ -33,62 +56,46 @@ export default function TabLayout() {
   });
 
   useEffect(() => {
-    if (fontsLoaded) {
-      SplashScreen.hideAsync();
-    }
+    if (fontsLoaded) SplashScreen.hideAsync();
   }, [fontsLoaded]);
 
-  // useEffect(() => {
-  //   const splashTimer = setTimeout(() => {
-  //     setAppState('login');
-  //   }, 2000);
-  //   return () => clearTimeout(splashTimer);
-  // }, []);
+  const handleNavigate = (tabId: string) => {
+    const next = APP_STATE_BY_TAB[tabId];
+    if (next) setAppState(next);
+  };
 
-  // useEffect(() => {
-  //   const splashTimer = setTimeout(() => {
-  //     setAppState('login');
-  //   }, 2000);
-  //   return () => clearTimeout(splashTimer);
-  // }, []);
+  const handleCategoryPress = (id: string) => {
+    setAppState(id as AppState);
+  };
 
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
     setAppState("app");
   };
 
-  const handleSignUpSuccess = () => {
-    setAppState("category");
-  };
-
-  if (!fontsLoaded) {
-    return null;
-  }
+  if (!fontsLoaded) return null;
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      {appState === "splash" && <SplashScreenComponent />}
-      {appState === "login" && (
-        <LoginScreen onLoginSuccess={handleLoginSuccess} onSignUp={() => setAppState("signup")} />
-      )}
-      {appState === "signup" && (
-        <SignUpScreen onSignUpSuccess={handleSignUpSuccess} onBack={() => setAppState("login")} />
-      )}
-      {appState === "category" && (
-        <CategoryScreen onConfirm={() => { setIsLoggedIn(true); setAppState("app"); }} />
-      )}
-      {appState === "app" && (
-        <MainScreen
-          onCategoryPress={(id) => { if (id === 'restaurant') setAppState('restaurant'); }}
-          onLookPress={() => setAppState('look')}
-        />
-      )}
-      {appState === "restaurant" && (
-        <RestaurantScreen onBack={() => setAppState("app")} />
-      )}
-      {appState === "look" && (
-        <LookScreen onBack={() => setAppState("app")} />
-      )}
+      {appState === "splash"    && <SplashScreenComponent />}
+      {appState === "login"     && <LoginScreen onLoginSuccess={handleLoginSuccess} onSignUp={() => setAppState("signup")} />}
+      {appState === "signup"    && <SignUpScreen onSignUpSuccess={() => setAppState("category")} onBack={() => setAppState("login")} />}
+      {appState === "category"  && <CategoryScreen onConfirm={() => { setIsLoggedIn(true); setAppState("app"); }} />}
+      {appState === "app"       && <HomeScreen onCategoryPress={handleCategoryPress} onNavigate={handleNavigate} onBannerPress={(idx) => { setSelectedBanner(idx); setAppState("bannerDetail"); }} />}
+      {appState === "bannerDetail" && <BannerDetailScreen bannerIndex={selectedBanner} onNavigate={handleNavigate} />}
+      {appState === "look"      && <LookScreen onNavigate={handleNavigate} />}
+      {appState === "write"     && <WriteScreen onNavigate={handleNavigate} onWriteReview={() => setAppState("writeReview")} />}
+      {appState === "writeReview" && <WriteReviewScreen onBack={() => setAppState("write")} onNavigate={handleNavigate} />}
+      {appState === "restaurant"  && <RestaurantScreen onNavigate={handleNavigate} />}
+      {appState === "cafe"        && <CafeScreen onNavigate={handleNavigate} />}
+      {appState === "movie"       && <MovieScreen onNavigate={handleNavigate} />}
+      {appState === "stay"        && <StayScreen onNavigate={handleNavigate} />}
+      {appState === "cosmetic"    && <CosmeticScreen onNavigate={handleNavigate} />}
+      {appState === "travel"      && <TravelScreen onNavigate={handleNavigate} />}
+      {appState === "book"        && <BookScreen onNavigate={handleNavigate} />}
+      {appState === "clothes"     && <ClothesScreen onNavigate={handleNavigate} />}
+      {appState === "electronics" && <ElectronicsScreen onNavigate={handleNavigate} />}
+      {appState === "etc"         && <EtcScreen onNavigate={handleNavigate} />}
     </ThemeProvider>
   );
 }
