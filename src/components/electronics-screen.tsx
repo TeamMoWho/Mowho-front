@@ -10,7 +10,6 @@ import {
   Dimensions,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Colors } from '@/constants/theme';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -25,12 +24,11 @@ const NAV_TABS = [
 const NAV_HEIGHT = 54;
 const NAV_MARGIN_BOTTOM = -8;
 
-
-interface RestaurantScreenProps {
+interface electronicsScreenProps {
   onNavigate?: (tabId: string) => void;
 }
 
-export default function RestaurantScreen({ onNavigate }: RestaurantScreenProps) {
+export default function electronicsScreen({ onNavigate }: electronicsScreenProps) {
   const insets = useSafeAreaInsets();
   const navBottom = insets.bottom + NAV_MARGIN_BOTTOM;
   const scrollPaddingBottom = NAV_HEIGHT + navBottom + 20;
@@ -39,7 +37,6 @@ export default function RestaurantScreen({ onNavigate }: RestaurantScreenProps) 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
 
-      {/* 상단 헤더 */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => onNavigate?.('home')} activeOpacity={0.7}>
           <Text style={styles.backArrow}>←</Text>
@@ -48,7 +45,7 @@ export default function RestaurantScreen({ onNavigate }: RestaurantScreenProps) 
           <Text style={styles.searchIcon}>🔍</Text>
           <TextInput
             style={styles.searchInput}
-            placeholder="맛있는 로기를 검색해보세요"
+            placeholder="가전제품 후기를 검색해보세요"
             placeholderTextColor="#828282"
             value={searchText}
             onChangeText={setSearchText}
@@ -61,15 +58,13 @@ export default function RestaurantScreen({ onNavigate }: RestaurantScreenProps) 
         contentContainerStyle={[styles.scrollContent, { paddingBottom: scrollPaddingBottom }]}
         showsVerticalScrollIndicator={false}
       >
-        {/* 타이틀 + 필터 */}
         <View style={styles.titleBlock}>
-          <Image source={require('../../assets/images/icon-restaurant-category.png')} style={styles.titleIcon} resizeMode="contain" />
+          <Image source={require('../../assets/images/categories/electronics.png')} style={styles.titleIcon} resizeMode="contain" />
           <View style={styles.titleTextBlock}>
-            <Text style={styles.titleText}>식당 카테고리를 추천드려요</Text>
+            <Text style={styles.titleText}>가전제품 카테고리를 추천드려요</Text>
           </View>
         </View>
 
-        {/* look-screen 프로토타입 카드 */}
         <View style={[styles.card, styles.cardEmpty]}>
           <View style={styles.cardTop}>
             <View style={styles.skeletonName} />
@@ -99,22 +94,15 @@ export default function RestaurantScreen({ onNavigate }: RestaurantScreenProps) 
         </View>
       </ScrollView>
 
-      {/* 하단 네비게이션 */}
       <View style={[styles.navWrapper, { bottom: navBottom }]} pointerEvents="box-none">
         <View style={styles.navBar}>
           {NAV_TABS.map((tab) => (
             <TouchableOpacity key={tab.id} style={styles.navItem} activeOpacity={0.7} onPress={() => onNavigate?.(tab.id)}>
-              <View style={[
-                styles.navTabInner,
-                tab.id === 'home' && styles.navTabInnerActive,
-                (tab as any).pb ? { paddingBottom: (tab as any).pb } : null,
-              ]}>
+              <View style={[styles.navTabInner, tab.id === 'home' && styles.navTabInnerActive, (tab as any).pb ? { paddingBottom: (tab as any).pb } : null]}>
                 <View style={styles.navIconBg}>
                   <Image source={tab.image} style={{ width: tab.w, height: tab.h }} resizeMode="contain" />
                 </View>
-                <Text style={[styles.navLabel, tab.id === 'home' && styles.navLabelActive]}>
-                  {tab.label}
-                </Text>
+                <Text style={[styles.navLabel, tab.id === 'home' && styles.navLabelActive]}>{tab.label}</Text>
               </View>
             </TouchableOpacity>
           ))}
@@ -126,182 +114,39 @@ export default function RestaurantScreen({ onNavigate }: RestaurantScreenProps) 
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFFFFF' },
-
-  /* 헤더 */
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
-    gap: 8,
-  },
+  header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 10, backgroundColor: '#FFFFFF', borderBottomWidth: 1, borderBottomColor: '#F0F0F0', gap: 8 },
   backButton: { padding: 4 },
   backArrow: { fontSize: 22, fontWeight: '600', color: '#000', fontFamily: 'Inter-SemiBold' },
-  searchBar: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F5F5F5',
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 9,
-    gap: 8,
-  },
+  searchBar: { flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: '#F5F5F5', borderRadius: 12, paddingHorizontal: 12, paddingVertical: 9, gap: 8 },
   searchIcon: { fontSize: 15 },
   searchInput: { flex: 1, fontSize: 14, fontFamily: 'Inter', color: '#000' },
-
-  /* 스크롤 */
   scroll: { flex: 1 },
   scrollContent: { paddingTop: 16, paddingHorizontal: 15 },
-
-  /* 타이틀 */
-  titleBlock: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 5,
-    marginBottom: 14,
-  },
-  titleIcon: {
-    width: 44,
-    height: 44,
-  },
-  titleTextBlock: {
-    paddingTop: 8,
-  },
-  titleText: {
-    fontSize: 18,
-    fontWeight: '700',
-    fontFamily: 'Inter-Bold',
-    color: '#000000',
-    lineHeight: 25,
-  },
-  titleSub: {
-    fontSize: 10,
-    fontWeight: '700',
-    fontFamily: 'Inter-Bold',
-    color: '#595959',
-    lineHeight: 14,
-  },
-
-  /* 필터 */
-  filterRow: { flexDirection: 'row', gap: 8, marginBottom: 16 },
-  filterChip: {
-    borderWidth: 1,
-    borderColor: Colors.light.primary,
-    borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    backgroundColor: '#fff',
-  },
-  filterChipText: { fontSize: 13, fontWeight: '500', fontFamily: 'Inter', color: '#000' },
-
-  /* 섹션 타이틀 */
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    fontFamily: 'Inter-Bold',
-    color: '#000',
-    marginBottom: 12,
-  },
-
-  /* 카드 */
-  card: {
-    backgroundColor: '#F5F5F5',
-    borderRadius: 10,
-    marginBottom: 16,
-    paddingTop: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 2,
-    elevation: 2,
-  },
+  titleBlock: { flexDirection: 'row', alignItems: 'flex-start', gap: 5, marginBottom: 14 },
+  titleIcon: { width: 44, height: 44 },
+  titleTextBlock: { paddingTop: 8 },
+  titleText: { fontSize: 18, fontWeight: '700', fontFamily: 'Inter-Bold', color: '#000000', lineHeight: 25 },
+  titleSub: { fontSize: 10, fontWeight: '700', fontFamily: 'Inter-Bold', color: '#595959', lineHeight: 14 },
+  card: { backgroundColor: '#F5F5F5', borderRadius: 10, marginBottom: 16, paddingTop: 12, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 2, elevation: 2 },
   cardEmpty: { borderWidth: 1, borderColor: '#D0D0D0', borderStyle: 'dashed' },
-
-  /* 카드 상단 */
-  cardTop: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-    paddingHorizontal: 12,
-    marginBottom: 10,
-  },
+  cardTop: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', paddingHorizontal: 12, marginBottom: 10 },
   cardActions: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   actionIcon: { width: 24, height: 24 },
   moreIcon: { fontSize: 13, color: '#555', letterSpacing: 1 },
-
-  /* 구분선 */
   divider: { height: 1, backgroundColor: '#5C5C5C', marginBottom: 10 },
-
-  /* 유저 프로필 */
-  cardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    marginBottom: 8,
-    gap: 8,
-  },
+  cardHeader: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, marginBottom: 8, gap: 8 },
   avatarCircleSkeleton: { width: 34, height: 34, borderRadius: 17, backgroundColor: '#D0D0D0' },
-
-  /* 별점 */
-  ratingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    gap: 4,
-    marginBottom: 10,
-  },
+  ratingRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, gap: 4, marginBottom: 10 },
   starIcon: { fontSize: 12, lineHeight: 14 },
-  starFilled: { color: '#FFD700' },
   starEmpty: { color: '#D0D0D0' },
-
-  /* 사진 플레이스홀더 */
-  photoPlaceholder: {
-    height: 151,
-    marginHorizontal: 12,
-    borderRadius: 6,
-    backgroundColor: '#D0D0D0',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  photoPlaceholder: { height: 151, marginHorizontal: 12, borderRadius: 6, backgroundColor: '#D0D0D0', alignItems: 'center', justifyContent: 'center' },
   photoPlaceholderText: { fontSize: 13, color: '#888' },
-
-  /* 스켈레톤 */
   skeletonName: { width: 100, height: 18, borderRadius: 4, backgroundColor: '#D0D0D0', marginBottom: 4 },
   skeletonLine: { height: 10, borderRadius: 4, backgroundColor: '#D0D0D0', width: 200 },
-
-  /* 네비게이션 */
   navWrapper: { position: 'absolute', left: 0, right: 0, alignItems: 'center' },
-  navBar: {
-    width: 325,
-    height: NAV_HEIGHT,
-    backgroundColor: 'rgba(255,255,255,0.9)',
-    borderRadius: 32,
-    borderWidth: 1,
-    borderColor: '#51E92B',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 4,
-  },
+  navBar: { width: 325, height: NAV_HEIGHT, backgroundColor: 'rgba(255,255,255,0.9)', borderRadius: 32, borderWidth: 1, borderColor: '#51E92B', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 4 },
   navItem: { alignItems: 'center', justifyContent: 'center' },
-  navTabInner: {
-    width: 60,
-    height: 46,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 4,
-    paddingBottom: 15,
-    marginHorizontal: -0.2,
-  },
+  navTabInner: { width: 60, height: 46, borderRadius: 20, alignItems: 'center', justifyContent: 'center', paddingTop: 4, paddingBottom: 15, marginHorizontal: -0.2 },
   navTabInnerActive: { backgroundColor: 'rgba(133, 235, 108, 0.5)' },
   navIconBg: { alignItems: 'center', justifyContent: 'center' },
   navLabel: { position: 'absolute', bottom: 3, fontSize: 10, fontWeight: '300', fontFamily: 'Inter', color: '#000' },

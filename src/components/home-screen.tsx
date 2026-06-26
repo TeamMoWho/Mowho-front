@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -10,10 +10,39 @@ import {
   Dimensions,
   NativeSyntheticEvent,
   NativeScrollEvent,
+  ActivityIndicator,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors } from '@/constants/theme';
+
+// ─── 지도 API 연동 준비 타입 ────────────────────────────────────────────────
+// TODO: expo-location 설치 후 실제 위치 요청으로 교체
+//   import * as Location from 'expo-location';
+
+interface MapRegion {
+  latitude: number;
+  longitude: number;
+  latitudeDelta: number;
+  longitudeDelta: number;
+}
+
+// TODO: 지도 위 후기 마커 데이터 (API 응답 타입)
+interface ReviewMarker {
+  id: string;
+  latitude: number;
+  longitude: number;
+  title: string;
+  reviewCount: number;
+}
+
+// 서울 중심 기본값 — 실제 위치 권한 획득 후 교체됨
+const DEFAULT_REGION: MapRegion = {
+  latitude: 37.5665,
+  longitude: 126.978,
+  latitudeDelta: 0.05,
+  longitudeDelta: 0.05,
+};
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -48,76 +77,128 @@ const BANNERS_DATA = [
     image: require('../../assets/images/banner-sangmyung.png'),
     title: '상명대학교 천안캠퍼스',
     address: '충청남도 천안시 동남구 상명대길 31',
-    total: 10,
   },
   {
     image: require('../../assets/images/banner-homigot.png'),
     title: '호미곶 해맞이 광장',
     address: '경북 포항시 남구 호미곶면 대보리',
-    total: 10,
   },
   {
     image: require('../../assets/images/banner-hollick.png'),
     title: '제주 훌릭 뮤지엄',
     address: '제주 제주시 애월읍 평화로 2835 제주훌릭뮤지엄',
-    total: 10,
   },
 ];
 
-// 마지막 → 첫 번째 무한 루프용: 첫 번째 배너를 맨 뒤에 복사
-const BANNERS = [...BANNERS_DATA, BANNERS_DATA[0]];
+// 양방향 무한 루프: 마지막 복사본을 앞에, 첫 번째 복사본을 뒤에 추가
+const BANNERS = [BANNERS_DATA[BANNERS_DATA.length - 1], ...BANNERS_DATA, BANNERS_DATA[0]];
 
 const NAV_HEIGHT = 54;
 const NAV_MARGIN_BOTTOM = -8;
 
-interface MainScreenProps {
+interface HomeScreenProps {
   onLogout?: () => void;
   onCategoryPress?: (categoryId: string) => void;
-  onLookPress?: () => void;
+  onNavigate?: (tabId: string) => void;
+  onBannerPress?: (bannerIndex: number) => void;
 }
 
-export default function MainScreen({ onLogout, onCategoryPress, onLookPress }: MainScreenProps) {
+export default function HomeScreen({ onLogout, onCategoryPress, onNavigate, onBannerPress }: HomeScreenProps) {
   const [activeTab, setActiveTab] = useState('home');
   const [searchText, setSearchText] = useState('');
   const [bannerIndex, setBannerIndex] = useState(0);
-  const bannerIndexRef = useRef(0);
+
+  // ── 지도 상태 ──────────────────────────────────────────────────────────────
+  const [mapRegion, setMapRegion] = useState<MapRegion>(DEFAULT_REGION);
+  const [markers, setMarkers] = useState<ReviewMarker[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+
+  // TODO: 지도 SDK 준비 후 아래 함수들로 실제 연동
+  //
+  // async function requestLocationPermission() {
+  //   const { status } = await Location.requestForegroundPermissionsAsync();
+  //   return status === 'granted';
+  // }
+  //
+  // async function fetchMarkersForRegion(region: MapRegion) {
+  //   const res = await fetch(
+  //     `https://api.mowho.com/reviews/nearby?lat=${region.latitude}&lng=${region.longitude}&delta=${region.latitudeDelta}`
+  //   );
+  //   const data: ReviewMarker[] = await res.json();
+  //   setMarkers(data);
+  // }
+
+  const handleReSearch = async () => {
+    if (isSearching) return;
+    setIsSearching(true);
+    try {
+      // TODO: 실제 위치 권한 요청 + 현재 위치 조회로 교체
+      // const granted = await requestLocationPermission();
+      // if (!granted) return;
+      // const loc = await Location.getCurrentPositionAsync({});
+      // const newRegion = { ...mapRegion, latitude: loc.coords.latitude, longitude: loc.coords.longitude };
+      // setMapRegion(newRegion);
+      // await fetchMarkersForRegion(newRegion);
+
+      // 프로토타입: 버튼 피드백만 시뮬레이션
+      await new Promise(resolve => setTimeout(resolve, 1200));
+    } finally {
+      setIsSearching(false);
+    }
+  };
+  const bannerScrollPosRef = useRef(1); // BANNERS[1]이 실제 첫 번째 배너
   const bannerScrollRef = useRef<ScrollView>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const insets = useSafeAreaInsets();
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      const next = bannerIndexRef.current + 1;
-      bannerScrollRef.current?.scrollTo({ x: next * BANNER_WIDTH, animated: true });
-      bannerIndexRef.current = next;
-      setBannerIndex(next % BANNERS_DATA.length);
+  const resetTimer = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      const nextPos = bannerScrollPosRef.current + 1;
+      bannerScrollRef.current?.scrollTo({ x: nextPos * BANNER_WIDTH, animated: true });
+      bannerScrollPosRef.current = nextPos;
+      setBannerIndex((nextPos - 1) % BANNERS_DATA.length);
 
-      // 복사본(마지막+1)에 도달하면 소리 없이 첫 번째로 점프
-      if (next === BANNERS_DATA.length) {
+      // 마지막 복사본(BANNERS_DATA.length + 1)에 도달하면 실제 첫 번째로 점프
+      if (nextPos === BANNERS_DATA.length + 1) {
         setTimeout(() => {
-          bannerScrollRef.current?.scrollTo({ x: 0, animated: false });
-          bannerIndexRef.current = 0;
+          bannerScrollRef.current?.scrollTo({ x: BANNER_WIDTH, animated: false });
+          bannerScrollPosRef.current = 1;
         }, 400);
       }
     }, 6000);
-    return () => clearInterval(timer);
   }, []);
 
-  const handleBannerScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const index = Math.round(e.nativeEvent.contentOffset.x / BANNER_WIDTH);
-    if (index < bannerIndexRef.current) {
-      bannerScrollRef.current?.scrollTo({ x: bannerIndexRef.current * BANNER_WIDTH, animated: true });
-      return;
-    }
-    bannerIndexRef.current = index;
-    setBannerIndex(index % BANNERS_DATA.length);
+  useEffect(() => {
+    // 실제 첫 번째 배너(index 1)에서 시작
+    setTimeout(() => {
+      bannerScrollRef.current?.scrollTo({ x: BANNER_WIDTH, animated: false });
+    }, 0);
+    resetTimer();
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [resetTimer]);
 
-    // 복사본(마지막+1)에 도달하면 소리 없이 첫 번째로 점프
-    if (index === BANNERS_DATA.length) {
+  const handleBannerScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const pos = Math.round(e.nativeEvent.contentOffset.x / BANNER_WIDTH);
+    bannerScrollPosRef.current = pos;
+    setBannerIndex((pos - 1 + BANNERS_DATA.length) % BANNERS_DATA.length);
+
+    // 첫 번째 복사본(pos=0)에서 실제 마지막으로 점프
+    if (pos === 0) {
       setTimeout(() => {
-        bannerScrollRef.current?.scrollTo({ x: 0, animated: false });
-        bannerIndexRef.current = 0;
+        bannerScrollRef.current?.scrollTo({ x: BANNERS_DATA.length * BANNER_WIDTH, animated: false });
+        bannerScrollPosRef.current = BANNERS_DATA.length;
       }, 400);
     }
+    // 마지막 복사본(pos=BANNERS_DATA.length+1)에서 실제 첫 번째로 점프
+    else if (pos === BANNERS_DATA.length + 1) {
+      setTimeout(() => {
+        bannerScrollRef.current?.scrollTo({ x: BANNER_WIDTH, animated: false });
+        bannerScrollPosRef.current = 1;
+      }, 400);
+    }
+
+    resetTimer();
   };
 
   const bottomInset = insets.bottom;
@@ -159,29 +240,37 @@ export default function MainScreen({ onLogout, onCategoryPress, onLookPress }: M
               ref={bannerScrollRef}
               style={styles.bannerScroll}
             >
-              {BANNERS.map((banner, idx) => (
-                <View key={idx} style={styles.banner}>
-                  <Image source={banner.image} style={styles.bannerImage} resizeMode="cover" />
-                  <View style={styles.bannerOverlay}>
-                    <View style={styles.outlineWrapper}>
-                      {[{top:-1,left:0},{top:1,left:0},{top:0,left:-1},{top:0,left:1}].map((offset, i) => (
-                        <Text key={i} style={[styles.bannerTitle, styles.bannerTitleOutline, offset]}>{banner.title}</Text>
-                      ))}
-                      <Text style={styles.bannerTitle}>{banner.title}</Text>
+              {BANNERS.map((banner, idx) => {
+                const realIdx = (idx - 1 + BANNERS_DATA.length) % BANNERS_DATA.length;
+                return (
+                  <TouchableOpacity
+                    key={idx}
+                    style={styles.banner}
+                    activeOpacity={0.9}
+                    onPress={() => onBannerPress?.(realIdx)}
+                  >
+                    <Image source={banner.image} style={styles.bannerImage} resizeMode="cover" />
+                    <View style={styles.bannerOverlay}>
+                      <View style={styles.outlineWrapper}>
+                        {[{top:-1,left:0},{top:1,left:0},{top:0,left:-1},{top:0,left:1}].map((offset, i) => (
+                          <Text key={i} style={[styles.bannerTitle, styles.bannerTitleOutline, offset]}>{banner.title}</Text>
+                        ))}
+                        <Text style={styles.bannerTitle}>{banner.title}</Text>
+                      </View>
+                      <View style={styles.outlineWrapper}>
+                        {[{top:-1,left:0},{top:1,left:0},{top:0,left:-1},{top:0,left:1}].map((offset, i) => (
+                          <Text key={i} style={[styles.bannerAddress, styles.bannerAddressOutline, offset]}>{banner.address}</Text>
+                        ))}
+                        <Text style={styles.bannerAddress}>{banner.address}</Text>
+                      </View>
                     </View>
-                    <View style={styles.outlineWrapper}>
-                      {[{top:-1,left:0},{top:1,left:0},{top:0,left:-1},{top:0,left:1}].map((offset, i) => (
-                        <Text key={i} style={[styles.bannerAddress, styles.bannerAddressOutline, offset]}>{banner.address}</Text>
-                      ))}
-                      <Text style={styles.bannerAddress}>{banner.address}</Text>
-                    </View>
-                  </View>
-                  <View style={styles.bannerIndicator}>
-                    <Text style={styles.bannerIndicatorText}>{(idx % BANNERS_DATA.length) + 1} / {BANNERS_DATA[0].total}</Text>
-                  </View>
-                </View>
-              ))}
+                  </TouchableOpacity>
+                );
+              })}
             </ScrollView>
+            <View style={styles.bannerIndicator} pointerEvents="none">
+              <Text style={styles.bannerIndicatorText}>{bannerIndex + 1} / {BANNERS_DATA.length}</Text>
+            </View>
           </View>
         </View>
 
@@ -212,15 +301,47 @@ export default function MainScreen({ onLogout, onCategoryPress, onLookPress }: M
         <View style={styles.mapSection}>
           <Text style={styles.mapTitle}>내 주변에서 핫한 후기에요</Text>
           <View style={styles.mapContainer}>
-            {/* 지도 placeholder → 추후 지도 API로 교체 */}
+            {/*
+              TODO: 지도 SDK 설치 후 아래 MapView로 교체
+              예시 (react-native-maps):
+                <MapView
+                  style={StyleSheet.absoluteFill}
+                  region={mapRegion}
+                  onRegionChangeComplete={setMapRegion}
+                  showsUserLocation
+                >
+                  {markers.map(m => (
+                    <Marker key={m.id} coordinate={{ latitude: m.latitude, longitude: m.longitude }}
+                      title={m.title} description={`후기 ${m.reviewCount}개`} />
+                  ))}
+                </MapView>
+            */}
             <View style={styles.mapPlaceholder}>
               <Text style={styles.mapPlaceholderEmoji}>🗺️</Text>
               <Text style={styles.mapPlaceholderLabel}>지도 영역</Text>
+              <Text style={styles.mapPlaceholderCoord}>
+                {mapRegion.latitude.toFixed(4)}, {mapRegion.longitude.toFixed(4)}
+              </Text>
             </View>
+
             {/* 이 지역 검색 버튼 */}
-            <TouchableOpacity style={styles.reSearchButton} activeOpacity={0.8}>
-              <Text style={styles.reSearchIcon}>🔍</Text>
-              <Text style={styles.reSearchText}>이 지역 검색</Text>
+            <TouchableOpacity
+              style={[styles.reSearchButton, isSearching && styles.reSearchButtonActive]}
+              activeOpacity={0.75}
+              onPress={handleReSearch}
+              disabled={isSearching}
+            >
+              {isSearching ? (
+                <>
+                  <ActivityIndicator size="small" color={Colors.light.primary} style={{ marginRight: 4 }} />
+                  <Text style={styles.reSearchText}>검색 중...</Text>
+                </>
+              ) : (
+                <>
+                  <Text style={styles.reSearchIcon}>🔍</Text>
+                  <Text style={styles.reSearchText}>이 지역 검색</Text>
+                </>
+              )}
             </TouchableOpacity>
           </View>
 
@@ -241,7 +362,7 @@ export default function MainScreen({ onLogout, onCategoryPress, onLookPress }: M
               style={styles.navItem}
               onPress={() => {
                 setActiveTab(tab.id);
-                if (tab.id === 'look') onLookPress?.();
+                onNavigate?.(tab.id);
               }}
               activeOpacity={0.7}
             >
@@ -480,6 +601,11 @@ const styles = StyleSheet.create({
     color: '#888',
     fontFamily: 'Inter',
   },
+  mapPlaceholderCoord: {
+    fontSize: 11,
+    color: '#aaa',
+    fontFamily: 'Inter',
+  },
   reSearchButton: {
     position: 'absolute',
     top: 20,
@@ -497,6 +623,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 2,
     elevation: 2,
+  },
+  reSearchButtonActive: {
+    backgroundColor: '#F0FDF0',
+    borderWidth: 1,
+    borderColor: Colors.light.primary,
   },
   reSearchIcon: {
     fontSize: 14,

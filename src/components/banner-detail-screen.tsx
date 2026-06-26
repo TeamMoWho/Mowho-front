@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -6,7 +5,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  TextInput,
   Dimensions,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -25,35 +23,45 @@ const NAV_TABS = [
 const NAV_HEIGHT = 54;
 const NAV_MARGIN_BOTTOM = -8;
 
+const BANNERS_DETAIL = [
+  {
+    image: require('../../assets/images/banner-sangmyung.png'),
+    title: '상명대학교 천안캠퍼스',
+    address: '충청남도 천안시 동남구 상명대길 31',
+  },
+  {
+    image: require('../../assets/images/banner-homigot.png'),
+    title: '호미곶 해맞이 광장',
+    address: '경북 포항시 남구 호미곶면 대보리',
+  },
+  {
+    image: require('../../assets/images/banner-hollick.png'),
+    title: '제주 훌릭 뮤지엄',
+    address: '제주 제주시 애월읍 평화로 2835 제주훌릭뮤지엄',
+  },
+];
 
-interface RestaurantScreenProps {
+const SKELETON_CARD_COUNT = 3;
+
+interface BannerDetailScreenProps {
+  bannerIndex: number;
   onNavigate?: (tabId: string) => void;
 }
 
-export default function RestaurantScreen({ onNavigate }: RestaurantScreenProps) {
+export default function BannerDetailScreen({ bannerIndex, onNavigate }: BannerDetailScreenProps) {
   const insets = useSafeAreaInsets();
   const navBottom = insets.bottom + NAV_MARGIN_BOTTOM;
   const scrollPaddingBottom = NAV_HEIGHT + navBottom + 20;
-  const [searchText, setSearchText] = useState('');
+  const banner = BANNERS_DETAIL[bannerIndex] ?? BANNERS_DETAIL[0];
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-
-      {/* 상단 헤더 */}
+      {/* 헤더 */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => onNavigate?.('home')} activeOpacity={0.7}>
           <Text style={styles.backArrow}>←</Text>
         </TouchableOpacity>
-        <View style={styles.searchBar}>
-          <Text style={styles.searchIcon}>🔍</Text>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="맛있는 로기를 검색해보세요"
-            placeholderTextColor="#828282"
-            value={searchText}
-            onChangeText={setSearchText}
-          />
-        </View>
+        <Text style={styles.headerTitle} numberOfLines={1}>{banner.title}</Text>
       </View>
 
       <ScrollView
@@ -61,41 +69,65 @@ export default function RestaurantScreen({ onNavigate }: RestaurantScreenProps) 
         contentContainerStyle={[styles.scrollContent, { paddingBottom: scrollPaddingBottom }]}
         showsVerticalScrollIndicator={false}
       >
-        {/* 타이틀 + 필터 */}
-        <View style={styles.titleBlock}>
-          <Image source={require('../../assets/images/icon-restaurant-category.png')} style={styles.titleIcon} resizeMode="contain" />
-          <View style={styles.titleTextBlock}>
-            <Text style={styles.titleText}>식당 카테고리를 추천드려요</Text>
-          </View>
+        {/* 히어로 이미지 */}
+        <View style={styles.heroWrapper}>
+          <Image source={banner.image} style={styles.heroImage} resizeMode="cover" />
         </View>
 
-        {/* look-screen 프로토타입 카드 */}
-        <View style={[styles.card, styles.cardEmpty]}>
-          <View style={styles.cardTop}>
-            <View style={styles.skeletonName} />
-            <View style={styles.cardActions}>
-              <Image source={require('../../assets/images/icon-heart.png')} style={styles.actionIcon} resizeMode="contain" />
-              <Text style={styles.moreIcon}>•••</Text>
+        {/* 장소 정보 */}
+        <View style={styles.placeInfo}>
+          <Text style={styles.placeTitle}>{banner.title}</Text>
+          <Text style={styles.placeAddress}>{banner.address}</Text>
+        </View>
+
+        <View style={styles.dividerBlock} />
+
+        {/* 후기 카드 목록 — look-screen 프로토타입 스타일 */}
+        <View style={styles.reviewSection}>
+          <Text style={styles.sectionTitle}>이 장소의 후기</Text>
+
+          {Array.from({ length: SKELETON_CARD_COUNT }).map((_, i) => (
+            <View key={i} style={[styles.card, styles.cardEmpty]}>
+
+              {/* 상단: 장소명 스켈레톤 + 액션 */}
+              <View style={styles.cardTop}>
+                <View style={styles.skeletonName} />
+                <View style={styles.cardActions}>
+                  <Image source={require('../../assets/images/icon-heart.png')} style={styles.actionIcon} resizeMode="contain" />
+                  <Text style={styles.moreIcon}>•••</Text>
+                </View>
+              </View>
+
+              {/* 구분선 */}
+              <View style={styles.divider} />
+
+              {/* 유저 프로필 스켈레톤 */}
+              <View style={styles.cardHeader}>
+                <View style={styles.avatarCircleSkeleton} />
+                <View>
+                  <View style={styles.skeletonLine} />
+                  <View style={[styles.skeletonLine, { width: 120, marginTop: 4 }]} />
+                </View>
+              </View>
+
+              {/* 별점 스켈레톤 */}
+              <View style={styles.ratingRow}>
+                {Array.from({ length: 5 }).map((_, si) => (
+                  <Text key={si} style={[styles.starIcon, styles.starEmpty]}>★</Text>
+                ))}
+              </View>
+
+              {/* 사진 플레이스홀더 */}
+              <View style={styles.photoPlaceholder}>
+                <Text style={styles.photoPlaceholderText}>사진</Text>
+              </View>
+
+              {/* 텍스트 스켈레톤 */}
+              <View style={[styles.skeletonLine, { width: '90%', marginHorizontal: 12, marginTop: 10 }]} />
+              <View style={[styles.skeletonLine, { width: '70%', marginHorizontal: 12, marginTop: 6, marginBottom: 12 }]} />
+
             </View>
-          </View>
-          <View style={styles.divider} />
-          <View style={styles.cardHeader}>
-            <View style={styles.avatarCircleSkeleton} />
-            <View>
-              <View style={styles.skeletonLine} />
-              <View style={[styles.skeletonLine, { width: 120, marginTop: 4 }]} />
-            </View>
-          </View>
-          <View style={styles.ratingRow}>
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Text key={i} style={[styles.starIcon, styles.starEmpty]}>★</Text>
-            ))}
-          </View>
-          <View style={styles.photoPlaceholder}>
-            <Text style={styles.photoPlaceholderText}>사진</Text>
-          </View>
-          <View style={[styles.skeletonLine, { width: '90%', marginHorizontal: 12, marginTop: 10 }]} />
-          <View style={[styles.skeletonLine, { width: '70%', marginHorizontal: 12, marginTop: 6, marginBottom: 12 }]} />
+          ))}
         </View>
       </ScrollView>
 
@@ -140,84 +172,85 @@ const styles = StyleSheet.create({
   },
   backButton: { padding: 4 },
   backArrow: { fontSize: 22, fontWeight: '600', color: '#000', fontFamily: 'Inter-SemiBold' },
-  searchBar: {
+  headerTitle: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F5F5F5',
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 9,
-    gap: 8,
-  },
-  searchIcon: { fontSize: 15 },
-  searchInput: { flex: 1, fontSize: 14, fontFamily: 'Inter', color: '#000' },
-
-  /* 스크롤 */
-  scroll: { flex: 1 },
-  scrollContent: { paddingTop: 16, paddingHorizontal: 15 },
-
-  /* 타이틀 */
-  titleBlock: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 5,
-    marginBottom: 14,
-  },
-  titleIcon: {
-    width: 44,
-    height: 44,
-  },
-  titleTextBlock: {
-    paddingTop: 8,
-  },
-  titleText: {
-    fontSize: 18,
-    fontWeight: '700',
-    fontFamily: 'Inter-Bold',
-    color: '#000000',
-    lineHeight: 25,
-  },
-  titleSub: {
-    fontSize: 10,
-    fontWeight: '700',
-    fontFamily: 'Inter-Bold',
-    color: '#595959',
-    lineHeight: 14,
-  },
-
-  /* 필터 */
-  filterRow: { flexDirection: 'row', gap: 8, marginBottom: 16 },
-  filterChip: {
-    borderWidth: 1,
-    borderColor: Colors.light.primary,
-    borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    backgroundColor: '#fff',
-  },
-  filterChipText: { fontSize: 13, fontWeight: '500', fontFamily: 'Inter', color: '#000' },
-
-  /* 섹션 타이틀 */
-  sectionTitle: {
     fontSize: 16,
     fontWeight: '700',
     fontFamily: 'Inter-Bold',
     color: '#000',
+  },
+
+  /* 스크롤 */
+  scroll: { flex: 1 },
+  scrollContent: {},
+
+  /* 히어로 이미지 */
+  heroWrapper: { width: '100%', height: 220 },
+  heroImage: { width: '100%', height: '100%' },
+  heroOverlay: { position: 'absolute', bottom: 12, left: 12 },
+  heroTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    fontFamily: 'Inter-Bold',
+    color: '#FFF',
+    textShadowColor: 'rgba(0,0,0,0.8)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
+  },
+  heroAddress: {
+    fontSize: 10,
+    fontFamily: 'Inter',
+    color: '#FFF',
+    marginTop: 4,
+    textShadowColor: 'rgba(0,0,0,0.8)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
+  },
+
+  /* 장소 정보 */
+  placeInfo: {
+    paddingHorizontal: 15,
+    paddingTop: 14,
+    paddingBottom: 14,
+    gap: 4,
+  },
+  placeTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    fontFamily: 'Inter-Bold',
+    color: '#000',
+  },
+  placeAddress: {
+    fontSize: 12,
+    fontFamily: 'Inter',
+    color: '#828282',
+  },
+
+  /* 구분 블록 */
+  dividerBlock: { height: 8, backgroundColor: '#F5F5F5' },
+
+  /* 후기 섹션 */
+  reviewSection: { paddingHorizontal: 15, paddingTop: 16 },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    fontFamily: 'Inter-Bold',
+    color: '#000',
+    lineHeight: 28,
     marginBottom: 12,
   },
 
-  /* 카드 */
+  /* 카드 (look-screen 동일) */
   card: {
     backgroundColor: '#F5F5F5',
     borderRadius: 10,
-    marginBottom: 16,
-    paddingTop: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 2,
     elevation: 2,
+    paddingTop: 12,
+    marginBottom: 16,
   },
   cardEmpty: { borderWidth: 1, borderColor: '#D0D0D0', borderStyle: 'dashed' },
 
@@ -255,7 +288,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   starIcon: { fontSize: 12, lineHeight: 14 },
-  starFilled: { color: '#FFD700' },
   starEmpty: { color: '#D0D0D0' },
 
   /* 사진 플레이스홀더 */
