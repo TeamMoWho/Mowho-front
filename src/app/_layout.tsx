@@ -61,7 +61,7 @@ SplashScreen.preventAutoHideAsync();
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
-  const [appState, setAppState] = useState<AppState>("app");
+  const [appState, setAppState] = useState<AppState>("login");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [selectedBanner, setSelectedBanner] = useState(0);
   const [fontsLoaded] = useFonts({

@@ -5,21 +5,16 @@ import {
   TextInput,
   TouchableOpacity,
   Text,
-  Dimensions,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
 } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { Image } from 'expo-image';
 import { Colors } from '@/constants/theme';
-
-const { height } = Dimensions.get('window');
 
 interface LoginProps {
   onLoginSuccess?: () => void;
   onSignUp?: () => void;
 }
-
-const VALID_USERNAME = 'mowho123';
-const VALID_PASSWORD = 'mowho12345';
 
 export default function LoginScreen({ onLoginSuccess, onSignUp }: LoginProps) {
   const [username, setUsername] = useState('');
@@ -33,14 +28,16 @@ export default function LoginScreen({ onLoginSuccess, onSignUp }: LoginProps) {
     }
 
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      if (username === VALID_USERNAME && password === VALID_PASSWORD) {
+    try {
+      // TODO: 실제 API 호출
+      setTimeout(() => {
+        setLoading(false);
         onLoginSuccess?.();
-      } else {
-        alert('아이디 또는 비밀번호가 올바르지 않습니다');
-      }
-    }, 500);
+      }, 1000);
+    } catch (error) {
+      setLoading(false);
+      alert('로그인 실패');
+    }
   };
 
   const handleSignUp = () => {
@@ -48,12 +45,11 @@ export default function LoginScreen({ onLoginSuccess, onSignUp }: LoginProps) {
   };
 
   return (
-    <KeyboardAwareScrollView
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
-      contentContainerStyle={styles.scrollContent}
-      enableOnAndroid
-      keyboardShouldPersistTaps="handled"
     >
+      <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.topSection}>
           {/* 로고 */}
           <View style={styles.logoContainer}>
@@ -63,32 +59,6 @@ export default function LoginScreen({ onLoginSuccess, onSignUp }: LoginProps) {
               <Text style={[styles.brandName, styles.outlineText, { left: -1, right: 1 }]}>MoWho</Text>
               <Text style={[styles.brandName, styles.outlineText, { left: 1, right: -1 }]}>MoWho</Text>
               <Text style={styles.brandName}>MoWho</Text>
-            </View>
-          </View>
-
-          {/* 설명 텍스트 */}
-          <View style={[styles.descriptionContainer, { opacity: 0 }]}>
-            <View style={styles.descriptionWrapper}>
-              <Text style={[styles.description, styles.descriptionOutline, { top: -0.8 }]}>
-                당신이 찾던 바로 그 후기,{'\n'}
-                취향 저격 리뷰, 여기서 확인하세요
-              </Text>
-              <Text style={[styles.description, styles.descriptionOutline, { top: 0.8 }]}>
-                당신이 찾던 바로 그 후기,{'\n'}
-                취향 저격 리뷰, 여기서 확인하세요
-              </Text>
-              <Text style={[styles.description, styles.descriptionOutline, { left: -0.8 }]}>
-                당신이 찾던 바로 그 후기,{'\n'}
-                취향 저격 리뷰, 여기서 확인하세요
-              </Text>
-              <Text style={[styles.description, styles.descriptionOutline, { left: 0.8 }]}>
-                당신이 찾던 바로 그 후기,{'\n'}
-                취향 저격 리뷰, 여기서 확인하세요
-              </Text>
-              <Text style={styles.description}>
-                당신이 찾던 바로 그 후기,{'\n'}
-                취향 저격 리뷰, 여기서 확인하세요
-              </Text>
             </View>
           </View>
         </View>
@@ -134,7 +104,8 @@ export default function LoginScreen({ onLoginSuccess, onSignUp }: LoginProps) {
             <Text style={styles.signUpButtonText}>회원가입</Text>
           </TouchableOpacity>
         </View>
-    </KeyboardAwareScrollView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -150,7 +121,7 @@ const styles = StyleSheet.create({
     paddingVertical: 40,
   },
   topSection: {
-    height: height * 0.55,
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -176,35 +147,14 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 0,
   },
-  descriptionContainer: {
-    alignItems: 'center',
-  },
-  descriptionWrapper: {
-    position: 'relative',
-  },
-  descriptionOutline: {
-    position: 'absolute',
-    color: 'rgba(0, 0, 0, 0.8)',
-    textShadowColor: 'transparent',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 0,
-  },
-  description: {
-    fontSize: 26,
-    color: 'white',
-    textAlign: 'center',
-    lineHeight: 28,
-    fontWeight: '900',
-    fontFamily: 'Jua',
-  },
   formContainer: {
-    gap: 10,
+    gap: 12,
   },
   input: {
     backgroundColor: 'white',
     borderRadius: 12,
     paddingHorizontal: 16,
-    height: 53,
+    paddingVertical: 14,
     fontSize: 16,
     color: Colors.light.text,
   },
@@ -213,27 +163,25 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 8,
   },
   loginButtonDisabled: {
     opacity: 0.6,
   },
   loginButtonText: {
     color: 'white',
-    fontSize: 18,
-    fontWeight: '700',
-    fontFamily: 'Inter-SemiBold',
+    fontSize: 16,
+    fontWeight: '600',
   },
   signUpButton: {
-    backgroundColor: '#2BB509',
+    backgroundColor: '#9E9E9E',
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: 'center',
   },
   signUpButtonText: {
     color: 'white',
-    fontSize: 18,
-    fontWeight: '700',
-    fontFamily: 'Inter-SemiBold',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
