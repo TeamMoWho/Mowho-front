@@ -27,17 +27,34 @@ import LookScreen from "@/components/look-screen";
 import BannerDetailScreen from "@/components/banner-detail-screen";
 import WriteScreen from "@/components/write-screen";
 import WriteReviewScreen from "@/components/write-review-screen";
+import MyPageScreen from "@/components/my-page-screen";
+import MyInfoScreen from "@/components/my-info-screen";
+import PasswordChangeScreen from "@/components/password-change-screen";
+import CustomerCenterScreen from "@/components/customer-center-screen";
+import NotificationScreen from "@/components/notification-screen";
+import FollowScreen from "@/components/follow-screen";
+import NotificationBellScreen from "@/components/notification-bell-screen";
+import SettingsScreen from "@/components/settings-screen";
+import TermsPolicyScreen from "@/components/terms-policy-screen";
+import WithdrawalScreen from "@/components/withdrawal-screen";
+import LikeScreen from "@/components/like-screen";
 
 type AppState =
   | "splash" | "login" | "signup" | "category" | "app" | "look" | "write" | "writeReview"
   | "restaurant" | "cafe" | "movie" | "stay" | "cosmetic"
   | "travel" | "book" | "clothes" | "electronics" | "etc"
-  | "bannerDetail";
+  | "bannerDetail"
+  | "like"
+  | "mypage" | "myinfo" | "password-change" | "customer"
+  | "notification" | "follow" | "bell-notification"
+  | "settings" | "terms" | "withdrawal";
 
 const APP_STATE_BY_TAB: Partial<Record<string, AppState>> = {
   home: 'app',
   look: 'look',
   write: 'write',
+  like: 'like',
+  my: 'mypage',
 };
 
 SplashScreen.preventAutoHideAsync();
@@ -96,6 +113,126 @@ export default function TabLayout() {
       {appState === "clothes"     && <ClothesScreen onNavigate={handleNavigate} />}
       {appState === "electronics" && <ElectronicsScreen onNavigate={handleNavigate} />}
       {appState === "etc"         && <EtcScreen onNavigate={handleNavigate} />}
+      {appState === "like" && (
+        <LikeScreen
+          onHomePress={() => setAppState("app")}
+          onLookPress={() => setAppState("look")}
+          onWritePress={() => setAppState("write")}
+          onLikePress={() => setAppState("like")}
+          onMyPress={() => setAppState("mypage")}
+        />
+      )}
+      {appState === "mypage" && (
+        <MyPageScreen
+          onHomePress={() => setAppState("app")}
+          onLookPress={() => setAppState("look")}
+          onWritePress={() => setAppState("write")}
+          onLikePress={() => setAppState("like")}
+          onBellPress={() => setAppState("bell-notification")}
+          onSettingsPress={() => setAppState("settings")}
+          onMenuPress={(menuId) => {
+            if (menuId === 'my-info') setAppState('myinfo');
+            if (menuId === 'follow') setAppState('follow');
+            if (menuId === 'notification') setAppState('notification');
+            if (menuId === 'support') setAppState('customer');
+          }}
+        />
+      )}
+      {appState === "myinfo" && (
+        <MyInfoScreen
+          onBack={() => setAppState("mypage")}
+          onHomePress={() => setAppState("app")}
+          onLookPress={() => setAppState("look")}
+          onWritePress={() => setAppState("write")}
+          onLikePress={() => setAppState("like")}
+          onMyPress={() => setAppState("mypage")}
+          onPasswordPress={() => setAppState("password-change")}
+        />
+      )}
+      {appState === "password-change" && (
+        <PasswordChangeScreen
+          onBack={() => setAppState("myinfo")}
+          onHomePress={() => setAppState("app")}
+          onLookPress={() => setAppState("look")}
+          onWritePress={() => setAppState("write")}
+          onLikePress={() => setAppState("like")}
+          onMyPress={() => setAppState("mypage")}
+        />
+      )}
+      {appState === "follow" && (
+        <FollowScreen
+          onBack={() => setAppState("mypage")}
+          onHomePress={() => setAppState("app")}
+          onLookPress={() => setAppState("look")}
+          onWritePress={() => setAppState("write")}
+          onLikePress={() => setAppState("like")}
+          onMyPress={() => setAppState("mypage")}
+        />
+      )}
+      {appState === "notification" && (
+        <NotificationScreen
+          onBack={() => setAppState("mypage")}
+          onHomePress={() => setAppState("app")}
+          onLookPress={() => setAppState("look")}
+          onWritePress={() => setAppState("write")}
+          onLikePress={() => setAppState("like")}
+          onMyPress={() => setAppState("mypage")}
+        />
+      )}
+      {appState === "bell-notification" && (
+        <NotificationBellScreen
+          onBack={() => setAppState("mypage")}
+          onHomePress={() => setAppState("app")}
+          onLookPress={() => setAppState("look")}
+          onWritePress={() => setAppState("write")}
+          onLikePress={() => setAppState("like")}
+          onMyPress={() => setAppState("mypage")}
+        />
+      )}
+      {appState === "customer" && (
+        <CustomerCenterScreen
+          onBack={() => setAppState("mypage")}
+          onHomePress={() => setAppState("app")}
+          onLookPress={() => setAppState("look")}
+          onWritePress={() => setAppState("write")}
+          onLikePress={() => setAppState("like")}
+          onMyPress={() => setAppState("mypage")}
+        />
+      )}
+      {appState === "settings" && (
+        <SettingsScreen
+          onBack={() => setAppState("mypage")}
+          onHomePress={() => setAppState("app")}
+          onLookPress={() => setAppState("look")}
+          onWritePress={() => setAppState("write")}
+          onLikePress={() => setAppState("like")}
+          onMyPress={() => setAppState("mypage")}
+          onTermsPress={() => setAppState("terms")}
+          onLogoutConfirm={() => { setIsLoggedIn(false); setAppState("login"); }}
+          onWithdrawalPress={() => setAppState("withdrawal")}
+        />
+      )}
+      {appState === "terms" && (
+        <TermsPolicyScreen
+          onBack={() => setAppState("settings")}
+          onHomePress={() => setAppState("app")}
+          onLookPress={() => setAppState("look")}
+          onWritePress={() => setAppState("write")}
+          onLikePress={() => setAppState("like")}
+          onMyPress={() => setAppState("mypage")}
+        />
+      )}
+      {appState === "withdrawal" && (
+        <WithdrawalScreen
+          onBack={() => setAppState("settings")}
+          onHomePress={() => setAppState("app")}
+          onLookPress={() => setAppState("look")}
+          onWritePress={() => setAppState("write")}
+          onLikePress={() => setAppState("like")}
+          onMyPress={() => setAppState("mypage")}
+          onConfirmWithdrawal={() => { setIsLoggedIn(false); setAppState("login"); }}
+        />
+      )}
     </ThemeProvider>
   );
 }

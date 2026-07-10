@@ -1,0 +1,216 @@
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SymbolView } from 'expo-symbols';
+
+type NavTabId = 'home' | 'look' | 'write' | 'like' | 'my';
+
+interface NavTabItem {
+  id: NavTabId;
+  label: string;
+  image: any;
+  w: number;
+  h: number;
+  pb?: number;
+}
+
+interface TermsPolicyScreenProps {
+  onBack?: () => void;
+  onHomePress?: () => void;
+  onLookPress?: () => void;
+  onWritePress?: () => void;
+  onLikePress?: () => void;
+  onMyPress?: () => void;
+}
+
+const NAV_TABS: NavTabItem[] = [
+  { id: 'home', label: 'HOME', image: require('../../assets/images/nav/home.png'), w: 32, h: 32 },
+  { id: 'look', label: 'LOOK', image: require('../../assets/images/nav/look.png'), w: 31, h: 27 },
+  { id: 'write', label: 'WRITE', image: require('../../assets/images/nav/write.png'), w: 29, h: 29, pb: 17 },
+  { id: 'like', label: 'LIKE', image: require('../../assets/images/nav/like.png'), w: 27, h: 23 },
+  { id: 'my', label: 'MY', image: require('../../assets/images/nav/my.png'), w: 31, h: 35 },
+];
+
+const NAV_HEIGHT = 54;
+const NAV_MARGIN_BOTTOM = -8;
+
+const POLICY_TEXT = `                                               푸른 소나무
+이 강산은 내가 지키노라 당신의 그 충정,
+하늘 보며 힘껏 흔들었던 평화의 깃발
+
+아~아 다시 선 이 땅엔 당신 닮은 푸른 소나무
+이 목숨 바쳐 큰 나라 위해 끝까지 싸우리라.
+
+이 강산은 내가 지키노라 당신의 그 맹세,
+만주 향해 힘껏 포효하던 백두산 호랑이.
+
+아~아 다시 선 이 땅엔 당신 닮은 푸른 소나무
+이 목숨 바쳐 큰 나라 위해 끝까지 싸우리라.
+
+⭐️대한민국 육군 지상작전사령부 예하 제5군단 제5보병사단 
+제27보병여단 통신중대 지원소대 TICN 운전병 병장 이호진⭐️`;
+
+export default function TermsPolicyScreen({
+  onBack,
+  onHomePress,
+  onLookPress,
+  onWritePress,
+  onLikePress,
+  onMyPress,
+}: TermsPolicyScreenProps) {
+  const insets = useSafeAreaInsets();
+  const navBottom = insets.bottom + NAV_MARGIN_BOTTOM;
+  const scrollPaddingBottom = NAV_HEIGHT + navBottom + 38;
+
+  const handleTabPress = (tabId: NavTabId) => {
+    if (tabId === 'home') onHomePress?.();
+    if (tabId === 'look') onLookPress?.();
+    if (tabId === 'write') onWritePress?.();
+    if (tabId === 'like') onLikePress?.();
+    if (tabId === 'my') onMyPress?.();
+  };
+
+  return (
+    <View style={[styles.container, { paddingTop: insets.top + 8 }]}>
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={onBack} activeOpacity={0.7}>
+          <Text style={styles.backButtonText}>←</Text>
+        </TouchableOpacity>
+        <Text style={styles.title}>약관 및 정책</Text>
+      </View>
+
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: scrollPaddingBottom }]}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.policyCard}>
+          <Text style={styles.policyText}>{POLICY_TEXT}</Text>
+        </View>
+      </ScrollView>
+
+      <View style={[styles.navWrapper, { bottom: navBottom }]} pointerEvents="box-none">
+        <View style={styles.navBar}>
+          {NAV_TABS.map((tab) => (
+            <TouchableOpacity
+              key={tab.id}
+              style={styles.navItem}
+              onPress={() => handleTabPress(tab.id)}
+              activeOpacity={0.7}
+            >
+              <View
+                style={[
+                  styles.navTabInner,
+                  tab.id === 'my' && styles.navTabInnerActive,
+                  tab.pb ? { paddingBottom: tab.pb } : null,
+                ]}
+              >
+                <View style={styles.navIconBg}>
+                  <Image source={tab.image} style={{ width: tab.w, height: tab.h }} resizeMode="contain" />
+                </View>
+                <Text style={[styles.navLabel, tab.id === 'my' && styles.navLabelActive]}>{tab.label}</Text>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  header: {
+    paddingHorizontal: 24,
+    paddingBottom: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  backButton: {
+    position: 'absolute',
+    left: 6,
+    top: 4,
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 10,
+  },
+  backButtonText: {
+    fontSize: 26,
+    fontWeight: '600',
+    fontFamily: 'Inter-SemiBold',
+    color: '#000000',
+    lineHeight: 30,
+  },
+  title: {
+    marginTop: 40,
+    fontSize: 20,
+    fontWeight: '700',
+    fontFamily: 'Inter-Bold',
+    color: '#000000',
+    lineHeight: 28,
+  },
+  scroll: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 34,
+  },
+  policyCard: {
+    minHeight: 300,
+    borderRadius: 10,
+    backgroundColor: '#D9D9D9',
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+  },
+  policyText: {
+    fontSize: 12,
+    lineHeight: 18,
+    color: '#202020',
+    fontFamily: 'Inter',
+    fontWeight: '700',
+  },
+  navWrapper: { position: 'absolute', left: 0, right: 0, alignItems: 'center' },
+  navBar: {
+    width: 325,
+    height: NAV_HEIGHT,
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    borderRadius: 32,
+    borderWidth: 1,
+    borderColor: '#51E92B',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  navItem: { alignItems: 'center', justifyContent: 'center' },
+  navTabInner: {
+    width: 60,
+    height: 46,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 4,
+    paddingBottom: 15,
+    marginHorizontal: -0.2,
+  },
+  navTabInnerActive: { backgroundColor: 'rgba(133, 235, 108, 0.5)' },
+  navIconBg: { alignItems: 'center', justifyContent: 'center' },
+  navLabel: {
+    position: 'absolute',
+    bottom: 3,
+    fontSize: 10,
+    fontWeight: '300',
+    fontFamily: 'Inter',
+    color: '#000000',
+  },
+  navLabelActive: { fontWeight: '300' },
+});
